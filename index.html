@@ -57,6 +57,7 @@
             const chatMessages = document.querySelector('#chat-messages');
             chatMessages.appendChild(messageDiv);
 
+            // Asegúrate de que el contenedor de mensajes se desplace hacia abajo
             chatMessages.scrollTop = chatMessages.scrollHeight;
         }
 
@@ -69,9 +70,11 @@
         });
 
         function loadMessages() {
+            const chatMessages = document.querySelector('#chat-messages');
+            chatMessages.innerHTML = ''; // Limpia los mensajes antiguos antes de cargar nuevos
+
             get(ref(db, 'chat')).then((snapshot) => {
                 if (snapshot.exists()) {
-                    const chatMessages = document.querySelector('#chat-messages');
                     snapshot.forEach((childSnapshot) => {
                         const data = childSnapshot.val();
                         displayMessage(data);
@@ -124,7 +127,8 @@
     </div>
 
     <div class="flex flex-col flex-grow pt-16">
-        <div id="chat-messages" class="flex-grow overflow-auto p-4 bg-white rounded-lg shadow-inner">
+        <div id="chat-messages" class="flex-grow overflow-auto p-4 bg-white rounded-lg shadow-inner" style="margin-bottom: 60px;">
+            <!-- Los mensajes del chat se cargarán aquí -->
         </div>
         <div class="fixed bottom-0 left-0 right-0 bg-pink-200 p-4 shadow-md">
             <div class="flex items-center space-x-4">
