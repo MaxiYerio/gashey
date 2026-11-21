@@ -1,292 +1,1289 @@
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chat</title>
-    <!-- Actualizado a Tailwind v3 CDN para soporte completo de utilidades modernas (glassmorphism, gradientes, animaciones) -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Fuente moderna Plus Jakarta Sans -->
+    <meta name="theme-color" content="#f8f5f2">
+
+    <title>Gashey — Un lugar para compartir</title>
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-    
+
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
     <style>
+        :root {
+            --background: #f8f5f2;
+            --surface: #ffffff;
+            --surface-soft: #fcfaf8;
+            --text: #34332f;
+            --muted: #96918b;
+            --border: #eee8e2;
+            --accent: #d98f83;
+            --accent-dark: #bd746a;
+            --accent-soft: #f8e9e5;
+            --green: #83a891;
+            --shadow: 0 24px 70px rgba(85, 65, 54, .09);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
         body {
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            background-color: #fdf2f8; /* pink-50 */
-            background-image: 
-                radial-gradient(at 0% 0%, rgba(251, 207, 232, 0.45) 0px, transparent 50%),
-                radial-gradient(at 100% 100%, rgba(244, 114, 182, 0.25) 0px, transparent 50%);
+            margin: 0;
+            min-height: 100vh;
+            padding: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background:
+                radial-gradient(circle at 10% 10%, #f4e5df 0, transparent 35%),
+                radial-gradient(circle at 90% 90%, #e9e8df 0, transparent 35%),
+                var(--background);
+            color: var(--text);
+            font-family: 'DM Sans', sans-serif;
         }
 
-        /* Scrollbar personalizado sutil en tonos rosa */
-        #chat-messages::-webkit-scrollbar {
-            width: 6px;
+        button, input, textarea {
+            font: inherit;
         }
-        #chat-messages::-webkit-scrollbar-track {
+
+        button {
+            cursor: pointer;
+        }
+
+        .app {
+            width: 100%;
+            max-width: 1050px;
+            height: min(780px, calc(100vh - 48px));
+            min-height: 540px;
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            overflow: hidden;
+            border: 1px solid rgba(255,255,255,.8);
+            border-radius: 25px;
+            background: var(--surface);
+            box-shadow: var(--shadow);
+        }
+
+        /* PANEL LATERAL */
+
+        .sidebar {
+            display: flex;
+            flex-direction: column;
+            padding: 35px 28px;
+            background: #f7f1ed;
+            border-right: 1px solid var(--border);
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .brand-icon {
+            width: 43px;
+            height: 43px;
+            display: grid;
+            place-items: center;
+            border-radius: 15px;
+            color: white;
+            background: linear-gradient(145deg, #e9a69a, #c77d73);
+            font-family: 'Manrope', sans-serif;
+            font-size: 25px;
+            font-weight: 800;
+        }
+
+        .brand-name {
+            font-family: 'Manrope', sans-serif;
+            font-size: 22px;
+            font-weight: 800;
+            letter-spacing: -1px;
+        }
+
+        .brand-name span {
+            color: var(--accent-dark);
+        }
+
+        .welcome {
+            margin-top: 100px;
+        }
+
+        .eyebrow {
+            color: var(--accent-dark);
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 1.8px;
+        }
+
+        .welcome h1 {
+            margin: 17px 0 14px;
+            font-family: 'Manrope', sans-serif;
+            font-size: 32px;
+            line-height: 1.2;
+            letter-spacing: -1.3px;
+        }
+
+        .welcome p {
+            color: #827c76;
+            font-size: 13px;
+            line-height: 1.9;
+        }
+
+        .quote {
+            margin-top: auto;
+            padding: 20px;
+            border: 1px solid #eadbd3;
+            border-radius: 17px;
+            background: rgba(255,255,255,.55);
+        }
+
+        .quote-symbol {
+            color: var(--accent);
+            font-family: Georgia, serif;
+            font-size: 30px;
+            line-height: 1;
+        }
+
+        .quote p {
+            margin: 9px 0 0;
+            color: #716963;
+            font-size: 12px;
+            line-height: 1.8;
+        }
+
+        .sidebar-footer {
+            margin-top: 25px;
+            color: #a39a93;
+            font-size: 10px;
+            text-align: center;
+        }
+
+        /* CHAT */
+
+        .chat {
+            min-width: 0;
+            display: flex;
+            flex-direction: column;
+            background: var(--surface);
+        }
+
+        .header {
+            min-height: 88px;
+            padding: 18px 26px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .room {
+            display: flex;
+            align-items: center;
+            gap: 13px;
+        }
+
+        .room-icon {
+            width: 43px;
+            height: 43px;
+            display: grid;
+            place-items: center;
+            border-radius: 15px;
+            background: var(--accent-soft);
+            color: var(--accent-dark);
+            font-size: 19px;
+        }
+
+        .room h2 {
+            margin: 0;
+            font-family: 'Manrope', sans-serif;
+            font-size: 15px;
+            font-weight: 800;
+        }
+
+        .room-status {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            margin-top: 5px;
+            color: var(--muted);
+            font-size: 10px;
+        }
+
+        .status-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: var(--green);
+        }
+
+        .status-dot.offline {
+            background: #d87979;
+        }
+
+        .profile {
+            width: 39px;
+            height: 39px;
+            border: 1px solid #edd6d0;
+            border-radius: 13px;
+            color: var(--accent-dark);
+            background: var(--accent-soft);
+            font-weight: 700;
+        }
+
+        /* AVISO */
+
+        .notice {
+            display: flex;
+            gap: 11px;
+            align-items: center;
+            margin: 18px 25px 0;
+            padding: 13px 15px;
+            border: 1px solid #f0e4dc;
+            border-radius: 12px;
+            background: #fcf8f4;
+        }
+
+        .notice-icon {
+            color: var(--accent-dark);
+            font-size: 17px;
+        }
+
+        .notice p {
+            margin: 0;
+            color: #898078;
+            font-size: 10px;
+            line-height: 1.6;
+        }
+
+        /* MENSAJES */
+
+        .messages {
+            flex: 1;
+            min-height: 0;
+            overflow-y: auto;
+            padding: 25px;
+            scroll-behavior: smooth;
+        }
+
+        .messages::-webkit-scrollbar {
+            width: 5px;
+        }
+
+        .messages::-webkit-scrollbar-thumb {
+            border-radius: 10px;
+            background: #e8dcd5;
+        }
+
+        .message {
+            display: flex;
+            align-items: flex-end;
+            gap: 10px;
+            margin-bottom: 20px;
+            animation: appear .2s ease;
+        }
+
+        .message.own {
+            justify-content: flex-end;
+        }
+
+        .avatar {
+            width: 32px;
+            height: 32px;
+            flex-shrink: 0;
+            display: grid;
+            place-items: center;
+            border-radius: 12px;
+            background: #f0e6e0;
+            color: #a56d63;
+            font-size: 11px;
+            font-weight: 700;
+        }
+
+        .message-content {
+            max-width: 76%;
+        }
+
+        .message-meta {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            margin: 0 4px 6px;
+            color: #a18d84;
+            font-size: 10px;
+        }
+
+        .own .message-meta {
+            justify-content: flex-end;
+        }
+
+        .message-time {
+            color: #b6ada6;
+            font-size: 9px;
+        }
+
+        .bubble {
+            padding: 12px 15px;
+            border: 1px solid #eee8e2;
+            border-radius: 16px 16px 16px 4px;
+            background: #faf8f6;
+            color: #49443f;
+            font-size: 12px;
+            line-height: 1.75;
+            overflow-wrap: anywhere;
+            white-space: pre-wrap;
+        }
+
+        .own .bubble {
+            border-color: #e9bcb2;
+            border-radius: 16px 16px 4px 16px;
+            background: linear-gradient(135deg, #d9978b, #c98278);
+            color: white;
+        }
+
+        .empty {
+            height: 100%;
+            min-height: 180px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+
+        .empty-icon {
+            width: 48px;
+            height: 48px;
+            display: grid;
+            place-items: center;
+            border-radius: 17px;
+            background: var(--accent-soft);
+            color: var(--accent-dark);
+            font-size: 22px;
+        }
+
+        .empty h3 {
+            margin: 15px 0 6px;
+            font-family: 'Manrope', sans-serif;
+            font-size: 15px;
+        }
+
+        .empty p {
+            max-width: 260px;
+            color: var(--muted);
+            font-size: 11px;
+            line-height: 1.7;
+        }
+
+        /* ESCRITOR */
+
+        .composer {
+            padding: 17px 25px 20px;
+            border-top: 1px solid var(--border);
+            background: #fdfbf9;
+        }
+
+        .composer-label {
+            display: flex;
+            justify-content: space-between;
+            margin: 0 3px 9px;
+            color: #a59a91;
+            font-size: 9px;
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+
+        .compose-box {
+            display: flex;
+            align-items: flex-end;
+            gap: 10px;
+            padding: 9px 9px 9px 15px;
+            border: 1px solid #eaded7;
+            border-radius: 15px;
+            background: white;
+            transition: .2s;
+        }
+
+        .compose-box:focus-within {
+            border-color: #dca096;
+            box-shadow: 0 0 0 3px #dca09618;
+        }
+
+        .compose-box textarea {
+            flex: 1;
+            min-width: 0;
+            max-height: 110px;
+            resize: none;
+            border: 0;
+            outline: 0;
             background: transparent;
-        }
-        #chat-messages::-webkit-scrollbar-thumb {
-            background: rgba(244, 114, 182, 0.35);
-            border-radius: 9999px;
-        }
-        #chat-messages::-webkit-scrollbar-thumb:hover {
-            background: rgba(236, 72, 153, 0.6);
+            color: var(--text);
+            font-size: 12px;
+            line-height: 1.6;
         }
 
-        /* Animación suave de entrada para mensajes */
-        @keyframes messagePop {
-            0% {
-                opacity: 0;
-                transform: translateY(10px) scale(0.97);
-            }
-            100% {
-                opacity: 1;
-                transform: translateY(0) scale(1);
-            }
+        .compose-box textarea::placeholder {
+            color: #c0b5ad;
         }
-        .animate-message {
-            animation: messagePop 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+
+        .send-button {
+            padding: 11px 15px;
+            border: 0;
+            border-radius: 11px;
+            color: white;
+            background: linear-gradient(135deg, #d9978b, #c98278);
+            font-size: 11px;
+            font-weight: 700;
+            transition: .2s;
+        }
+
+        .send-button:hover {
+            filter: brightness(.95);
+            transform: translateY(-1px);
+        }
+
+        .send-button:disabled {
+            opacity: .45;
+            cursor: not-allowed;
+        }
+
+        .composer-hint {
+            display: block;
+            margin: 8px 3px 0;
+            color: #b2a8a0;
+            font-size: 9px;
+        }
+
+        /* MODAL DE USUARIO */
+
+        .modal {
+            position: fixed;
+            inset: 0;
+            z-index: 10;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            background: rgba(57, 43, 39, .35);
+            backdrop-filter: blur(8px);
+        }
+
+        .modal.visible {
+            display: flex;
+        }
+
+        .modal-card {
+            width: 100%;
+            max-width: 390px;
+            padding: 35px;
+            border: 1px solid white;
+            border-radius: 23px;
+            background: #fffdfb;
+            box-shadow: 0 25px 80px rgba(60, 40, 30, .16);
+            animation: appear .25s ease;
+        }
+
+        .modal-logo {
+            width: 48px;
+            height: 48px;
+            display: grid;
+            place-items: center;
+            margin-bottom: 25px;
+            border-radius: 16px;
+            background: var(--accent-soft);
+            color: var(--accent-dark);
+            font-size: 24px;
+        }
+
+        .modal-card h2 {
+            margin: 10px 0;
+            font-family: 'Manrope', sans-serif;
+            font-size: 25px;
+            letter-spacing: -.8px;
+        }
+
+        .modal-card p {
+            margin: 0 0 23px;
+            color: #898078;
+            font-size: 12px;
+            line-height: 1.8;
+        }
+
+        .modal-card label {
+            display: block;
+            margin-bottom: 8px;
+            color: #766d66;
+            font-size: 10px;
+            font-weight: 700;
+        }
+
+        .modal-card input {
+            width: 100%;
+            padding: 13px;
+            border: 1px solid #e9ded7;
+            border-radius: 11px;
+            outline: 0;
+            background: white;
+            color: var(--text);
+            font-size: 12px;
+        }
+
+        .modal-card input:focus {
+            border-color: var(--accent);
+        }
+
+        .modal-card button {
+            width: 100%;
+            margin-top: 14px;
+            padding: 13px;
+            border: 0;
+            border-radius: 11px;
+            color: white;
+            background: linear-gradient(135deg, #d9978b, #c98278);
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .modal-error {
+            display: none;
+            margin-top: 9px;
+            color: #bd5e5e;
+            font-size: 11px;
+        }
+
+        .modal-error.visible {
+            display: block;
+        }
+
+        .toast {
+            position: fixed;
+            left: 50%;
+            bottom: 25px;
+            transform: translate(-50%, 10px);
+            padding: 12px 17px;
+            border-radius: 11px;
+            background: #403a36;
+            color: white;
+            font-size: 11px;
+            opacity: 0;
+            pointer-events: none;
+            transition: .2s;
+        }
+
+        .toast.visible {
+            opacity: 1;
+            transform: translate(-50%, 0);
+        }
+
+        @keyframes appear {
+            from { opacity: 0; transform: translateY(7px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @media (max-width: 760px) {
+            body {
+                padding: 0;
+            }
+
+            .app {
+                display: flex;
+                height: 100dvh;
+                min-height: 0;
+                border: 0;
+                border-radius: 0;
+            }
+
+            .sidebar {
+                display: none;
+            }
+
+            .header {
+                min-height: 75px;
+                padding: 15px;
+            }
+
+            .notice {
+                margin: 12px 15px 0;
+            }
+
+            .messages {
+                padding: 20px 15px;
+            }
+
+            .message-content {
+                max-width: 83%;
+            }
+
+            .composer {
+                padding: 13px 15px max(14px, env(safe-area-inset-bottom));
+            }
+
+            .composer-hint {
+                display: none;
+            }
         }
     </style>
+</head>
+
+<body>
+
+    <main class="app">
+
+        <aside class="sidebar">
+
+            <div class="brand">
+                <div class="brand-icon">g.</div>
+                <div class="brand-name">gashey<span>.</span></div>
+            </div>
+
+            <div class="welcome">
+                <div class="eyebrow">UN ESPACIO PARA CONECTAR</div>
+
+                <h1>Siempre hay<br>alguien del otro<br>lado.</h1>
+
+                <p>
+                    A veces, unas pocas palabras pueden cambiar el día.
+                    Este es un lugar para compartirlas, escuchar y acompañarnos.
+                </p>
+            </div>
+
+            <div class="quote">
+                <div class="quote-symbol">“</div>
+                <p>
+                    No hace falta tener algo extraordinario para decir.
+                    A veces, estar presente ya significa mucho.
+                </p>
+            </div>
+
+            <div class="sidebar-footer">
+                Hecho para compartir buenos momentos.
+            </div>
+
+        </aside>
+
+        <section class="chat">
+
+            <header class="header">
+
+                <div class="room">
+
+                    <div class="room-icon">✦</div>
+
+                    <div>
+                        <h2>Un lugar para compartir</h2>
+
+                        <div class="room-status">
+                            <span id="status-dot" class="status-dot"></span>
+                            <span id="connection-status">Conectando...</span>
+                        </div>
+                    </div>
+
+                </div>
+
+                <button id="profile-button" class="profile" title="Cambiar nombre">
+                    ?
+                </button>
+
+            </header>
+
+            <div class="notice">
+                <span class="notice-icon">♡</span>
+                <p>
+                    Cada persona merece respeto.
+                    <strong>Hagamos de este un espacio agradable para todos.</strong>
+                </p>
+            </div>
+
+            <section id="chat-messages" class="messages" aria-live="polite">
+
+                <div id="empty-state" class="empty">
+                    <div class="empty-icon">♡</div>
+                    <h3>La conversación empieza acá</h3>
+                    <p>
+                        Todavía no hay mensajes.
+                        Podés ser quien dé el primer paso.
+                    </p>
+                </div>
+
+            </section>
+
+            <form id="message-form" class="composer">
+
+                <div class="composer-label">
+                    <span>ESCRIBIR UN MENSAJE</span>
+                    <span id="character-count">0 / 500</span>
+                </div>
+
+                <div class="compose-box">
+
+                    <textarea
+                        id="message-input"
+                        rows="1"
+                        maxlength="500"
+                        placeholder="Compartí algo con la comunidad..."
+                        disabled
+                    ></textarea>
+
+                    <button id="send-button" class="send-button" type="submit" disabled>
+                        Enviar ↗
+                    </button>
+
+                </div>
+
+                <small class="composer-hint">
+                    Enter para enviar · Shift + Enter para escribir otra línea
+                </small>
+
+            </form>
+
+        </section>
+
+    </main>
+
+    <!-- MODAL PARA ELEGIR NOMBRE -->
+
+    <div id="username-modal" class="modal">
+
+        <form id="username-form" class="modal-card">
+
+            <div class="modal-logo">♡</div>
+
+            <div class="eyebrow">ANTES DE ENTRAR</div>
+
+            <h2>¿Cómo te llamamos?</h2>
+
+            <p>
+                Elegí un nombre o apodo para que los demás puedan reconocerte.
+                Nos alegra que estés acá.
+            </p>
+
+            <label for="username-input">TU NOMBRE O APODO</label>
+
+            <input
+                id="username-input"
+                type="text"
+                maxlength="24"
+                minlength="2"
+                placeholder="Por ejemplo, Alex"
+                autocomplete="nickname"
+                required
+            >
+
+            <div id="username-error" class="modal-error">
+                Escribí un nombre de al menos 2 caracteres.
+            </div>
+
+            <button type="submit">Entrar al chat →</button>
+
+        </form>
+
+    </div>
+
+    <div id="toast" class="toast"></div>
+
+    <!-- FIREBASE Y FUNCIONALIDAD -->
 
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js";
-        import { getDatabase, ref, push, onChildAdded, get } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-database.js";
+
+        import { initializeApp }
+            from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+
+        import {
+            getDatabase,
+            ref,
+            push,
+            onChildAdded,
+            query,
+            limitToLast
+        } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+
+
+        // =====================================================
+        // CONFIGURACIÓN DE FIREBASE
+        // REEMPLAZÁ ESTOS DATOS POR LOS DE TU PROYECTO REAL
+        // =====================================================
 
         const firebaseConfig = {
-            apiKey: "YOUR_API_KEY",
-            authDomain: "revistadigital-f5fd3.firebaseapp.com",
-            databaseURL: "https://gashey-5be3c-default-rtdb.firebaseio.com",
-            projectId: "revistadigital-f5fd3",
-            storageBucket: "revistadigital-f5fd3.appspot.com",
-            messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-            appId: "YOUR_APP_ID"
+            apiKey: "TU_API_KEY",
+            authDomain: "TU_AUTH_DOMAIN",
+            databaseURL: "TU_DATABASE_URL",
+            projectId: "TU_PROJECT_ID",
+            storageBucket: "TU_STORAGE_BUCKET",
+            messagingSenderId: "TU_MESSAGING_SENDER_ID",
+            appId: "TU_APP_ID"
         };
+
+
+        // =====================================================
+        // INICIALIZACIÓN
+        // =====================================================
 
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
 
-        window.sendMessage = function() {
-            const messageInput = document.getElementById("messageInput");
-            const message = messageInput.value.trim();
-            const username = localStorage.getItem('username') || 'Anonimo';
-            if (message) {
-                const messageData = {
-                    username: username,
-                    message: message
-                };
+        const chatRef = ref(db, "chat");
 
-                push(ref(db, 'chat'), messageData)
-                    .then(() => {
-                        console.log("Mensaje enviado con éxito");
-                        messageInput.value = "";
-                    })
-                    .catch((error) => {
-                        console.error("Error al enviar el mensaje:", error);
-                    });
+        const recentMessages = query(
+            chatRef,
+            limitToLast(100)
+        );
+
+
+        // =====================================================
+        // ELEMENTOS HTML
+        // =====================================================
+
+        const chatMessages = document.getElementById("chat-messages");
+
+        const messageInput = document.getElementById("message-input");
+
+        const messageForm = document.getElementById("message-form");
+
+        const sendButton = document.getElementById("send-button");
+
+        const usernameModal = document.getElementById("username-modal");
+
+        const usernameForm = document.getElementById("username-form");
+
+        const usernameInput = document.getElementById("username-input");
+
+        const usernameError = document.getElementById("username-error");
+
+        const profileButton = document.getElementById("profile-button");
+
+        const connectionStatus = document.getElementById("connection-status");
+
+        const statusDot = document.getElementById("status-dot");
+
+        const characterCount = document.getElementById("character-count");
+
+        const toast = document.getElementById("toast");
+
+
+        // =====================================================
+        // USUARIO
+        // =====================================================
+
+        let username = localStorage.getItem("gashey_username") || "";
+
+        let isConnected = false;
+
+        let sending = false;
+
+        let toastTimer;
+
+
+        function updateProfile() {
+
+            profileButton.textContent = username
+                ? username.charAt(0).toUpperCase()
+                : "?";
+
+        }
+
+
+        function openUsernameModal() {
+
+            usernameInput.value = username;
+
+            usernameModal.classList.add("visible");
+
+            usernameInput.focus();
+
+        }
+
+
+        function closeUsernameModal() {
+
+            usernameModal.classList.remove("visible");
+
+        }
+
+
+        function showToast(message) {
+
+            toast.textContent = message;
+
+            toast.classList.add("visible");
+
+            clearTimeout(toastTimer);
+
+            toastTimer = setTimeout(() => {
+
+                toast.classList.remove("visible");
+
+            }, 2800);
+
+        }
+
+
+        // =====================================================
+        // ESTADO DE CONEXIÓN
+        // =====================================================
+
+        function updateConnection(connected) {
+
+            isConnected = connected;
+
+            if (connected) {
+
+                connectionStatus.textContent = "Sala conectada";
+
+                statusDot.classList.remove("offline");
+
             } else {
-                console.log("Mensaje vacío, no se enviará");
+
+                connectionStatus.textContent = "Sin conexión";
+
+                statusDot.classList.add("offline");
+
             }
+
+            updateSendButton();
+
         }
 
-        // Helper para escapar HTML y evitar inyecciones visuales manteniendo intacta la lógica
-        function escapeHTML(str) {
-            return String(str)
-                .replace(/&/g, "&amp;")
-                .replace(/</g, "&lt;")
-                .replace(/>/g, "&gt;")
-                .replace(/"/g, "&quot;")
-                .replace(/'/g, "&#039;");
+
+        function updateSendButton() {
+
+            sendButton.disabled =
+                !username ||
+                !isConnected ||
+                !messageInput.value.trim() ||
+                sending;
+
+            messageInput.disabled = !username || !isConnected;
+
         }
+
+
+        // =====================================================
+        // CAMBIAR NOMBRE
+        // =====================================================
+
+        usernameForm.addEventListener("submit", (event) => {
+
+            event.preventDefault();
+
+            const newUsername = usernameInput.value
+                .trim()
+                .replace(/\s+/g, " ");
+
+            if (newUsername.length < 2) {
+
+                usernameError.classList.add("visible");
+
+                return;
+
+            }
+
+            usernameError.classList.remove("visible");
+
+            username = newUsername.slice(0, 24);
+
+            localStorage.setItem("gashey_username", username);
+
+            updateProfile();
+
+            closeUsernameModal();
+
+            updateSendButton();
+
+            messageInput.focus();
+
+        });
+
+
+        profileButton.addEventListener("click", openUsernameModal);
+
+
+        // =====================================================
+        // FORMATO DE HORARIO
+        // =====================================================
+
+        function formatTime(timestamp) {
+
+            if (!timestamp) return "";
+
+            return new Intl.DateTimeFormat("es-AR", {
+
+                hour: "2-digit",
+
+                minute: "2-digit"
+
+            }).format(new Date(timestamp));
+
+        }
+
+
+        // =====================================================
+        // MOSTRAR MENSAJES
+        // =====================================================
 
         function displayMessage(data) {
-            const currentUsername = localStorage.getItem('username') || 'Anonimo';
-            const isOwnMessage = data.username === currentUsername;
-            const initial = (data.username || 'A').charAt(0).toUpperCase();
 
-            const messageWrapper = document.createElement("div");
-            messageWrapper.className = `flex w-full mb-3.5 animate-message ${isOwnMessage ? 'justify-end' : 'justify-start'}`;
+            if (
+                !data ||
+                typeof data.username !== "string" ||
+                typeof data.message !== "string"
+            ) {
+
+                return;
+
+            }
+
+            document.getElementById("empty-state")?.remove();
+
+            const isOwnMessage = data.username === username;
+
+            const wrapper = document.createElement("article");
+
+            wrapper.className = "message";
 
             if (isOwnMessage) {
-                // Burbuja de mensaje propio (alineada a la derecha, degradado rosa vibrante)
-                messageWrapper.innerHTML = `
-                    <div class="flex flex-col items-end max-w-[80%] sm:max-w-[70%]">
-                        <span class="text-[11px] font-medium text-pink-500 mb-1 px-1">Tú (${escapeHTML(data.username)})</span>
-                        <div class="bg-gradient-to-br from-pink-500 to-pink-600 text-white px-4 py-2.5 rounded-2xl rounded-tr-sm shadow-sm shadow-pink-200 text-sm sm:text-[15px] leading-relaxed break-words">
-                            ${escapeHTML(data.message)}
-                        </div>
-                    </div>
-                `;
-            } else {
-                // Burbuja de otros usuarios (alineada a la izquierda, con avatar e inicial)
-                messageWrapper.innerHTML = `
-                    <div class="flex items-end gap-2.5 max-w-[82%] sm:max-w-[72%]">
-                        <div class="w-8 h-8 rounded-full bg-gradient-to-tr from-pink-200 to-pink-300 border border-pink-300/60 flex items-center justify-center text-pink-700 font-bold text-xs flex-shrink-0 shadow-xs">
-                            ${escapeHTML(initial)}
-                        </div>
-                        <div class="flex flex-col items-start">
-                            <span class="text-[11px] font-semibold text-pink-600 mb-1 px-1">${escapeHTML(data.username)}</span>
-                            <div class="bg-pink-100/90 border border-pink-200/80 text-gray-800 px-4 py-2.5 rounded-2xl rounded-tl-sm shadow-xs text-sm sm:text-[15px] leading-relaxed break-words">
-                                ${escapeHTML(data.message)}
-                            </div>
-                        </div>
-                    </div>
-                `;
+
+                wrapper.classList.add("own");
+
             }
 
-            const chatMessages = document.querySelector('#chat-messages');
-            chatMessages.appendChild(messageWrapper);
+
+            // Avatar
+
+            const avatar = document.createElement("div");
+
+            avatar.className = "avatar";
+
+            avatar.textContent = data.username.charAt(0).toUpperCase();
+
+
+            // Contenedor
+
+            const content = document.createElement("div");
+
+            content.className = "message-content";
+
+
+            // Nombre y hora
+
+            const meta = document.createElement("div");
+
+            meta.className = "message-meta";
+
+            const name = document.createElement("strong");
+
+            name.textContent = isOwnMessage ? "Vos" : data.username;
+
+            const time = document.createElement("span");
+
+            time.className = "message-time";
+
+            time.textContent = formatTime(data.createdAt);
+
+            meta.append(name, time);
+
+
+            // Texto
+
+            const bubble = document.createElement("div");
+
+            bubble.className = "bubble";
+
+            bubble.textContent = data.message;
+
+
+            content.append(meta, bubble);
+
+
+            if (isOwnMessage) {
+
+                wrapper.append(content);
+
+            } else {
+
+                wrapper.append(avatar, content);
+
+            }
+
+
+            chatMessages.append(wrapper);
+
             chatMessages.scrollTop = chatMessages.scrollHeight;
+
         }
 
-        onChildAdded(ref(db, 'chat'), function(snapshot) {
-            const data = snapshot.val();
-            console.log("Nuevo mensaje recibido:", data);
-            displayMessage(data);
-        }, (error) => {
-            console.error("Error al recibir mensajes:", error);
-        });
 
-        function loadMessages() {
-            const chatMessages = document.querySelector('#chat-messages');
-            chatMessages.innerHTML = '';
+        // =====================================================
+        // RECIBIR MENSAJES EN TIEMPO REAL
+        // =====================================================
 
-            get(ref(db, 'chat')).then((snapshot) => {
-                if (snapshot.exists()) {
-                    snapshot.forEach((childSnapshot) => {
-                        const data = childSnapshot.val();
-                        displayMessage(data);
-                    });
-                    chatMessages.scrollTop = chatMessages.scrollHeight;
-                }
-            }).catch((error) => {
-                console.error("Error al cargar mensajes:", error);
-            });
-        }
+        onChildAdded(
 
-        function updateHeaderUserBadge(username) {
-            const badge = document.getElementById('current-user-badge');
-            if (badge && username) {
-                badge.textContent = username;
-                badge.parentElement.classList.remove('hidden');
-            }
-        }
+            recentMessages,
 
-        document.addEventListener('DOMContentLoaded', () => {
-            const savedUsername = localStorage.getItem('username');
-            if (!savedUsername) {
-                document.querySelector('#username-form').classList.remove('hidden');
-            } else {
-                document.querySelector('#username-form').classList.add('hidden');
-                updateHeaderUserBadge(savedUsername);
-                loadMessages();
+            (snapshot) => {
+
+                const data = snapshot.val();
+
+                displayMessage(data);
+
+            },
+
+            (error) => {
+
+                console.error("Error al recibir mensajes:", error);
+
+                showToast("No se pudieron cargar los mensajes.");
+
             }
 
-            const submitUsername = () => {
-                const usernameInput = document.getElementById('usernameInput');
-                const username = usernameInput.value.trim();
-                if (username) {
-                    localStorage.setItem('username', username);
-                    document.querySelector('#username-form').classList.add('hidden');
-                    updateHeaderUserBadge(username);
-                    loadMessages();
-                }
+        );
+
+
+        // =====================================================
+        // ENVIAR MENSAJES
+        // =====================================================
+
+        async function sendMessage() {
+
+            const message = messageInput.value.trim();
+
+            if (!message || sending || !username || !isConnected) {
+
+                return;
+
+            }
+
+            if (message.length > 500) {
+
+                showToast("El mensaje es demasiado largo.");
+
+                return;
+
+            }
+
+            sending = true;
+
+            updateSendButton();
+
+
+            // El nombre se guarda junto con cada mensaje en Firebase.
+
+            const messageData = {
+
+                username: username,
+
+                message: message,
+
+                createdAt: Date.now()
+
             };
 
-            document.querySelector('#username-submit').addEventListener('click', submitUsername);
 
-            // Permitir también entrar presionando Enter en el modal de nombre
-            document.getElementById('usernameInput').addEventListener('keypress', (e) => {
-                if (e.key === 'Enter') {
-                    e.preventDefault();
-                    submitUsername();
-                }
-            });
+            try {
 
-            const messageInput = document.getElementById("messageInput");
-            messageInput.addEventListener('keypress', function (event) {
-                if (event.key === 'Enter') {
-                    event.preventDefault();
-                    sendMessage();
-                }
-            });
+                await push(chatRef, messageData);
+
+                messageInput.value = "";
+
+                messageInput.style.height = "auto";
+
+                characterCount.textContent = "0 / 500";
+
+            } catch (error) {
+
+                console.error("Error al enviar:", error);
+
+                showToast("No se pudo enviar el mensaje.");
+
+            } finally {
+
+                sending = false;
+
+                updateSendButton();
+
+                messageInput.focus();
+
+            }
+
+        }
+
+
+        messageForm.addEventListener("submit", (event) => {
+
+            event.preventDefault();
+
+            sendMessage();
+
         });
+
+
+        // =====================================================
+        // CONTADOR Y TECLADO
+        // =====================================================
+
+        messageInput.addEventListener("input", () => {
+
+            characterCount.textContent =
+                `${messageInput.value.length} / 500`;
+
+            messageInput.style.height = "auto";
+
+            messageInput.style.height =
+                Math.min(messageInput.scrollHeight, 110) + "px";
+
+            updateSendButton();
+
+        });
+
+
+        messageInput.addEventListener("keydown", (event) => {
+
+            if (event.key === "Enter" && !event.shiftKey) {
+
+                event.preventDefault();
+
+                messageForm.requestSubmit();
+
+            }
+
+        });
+
+
+        // =====================================================
+        // CONEXIÓN REALTIME DATABASE
+        // =====================================================
+
+        const connectionRef = ref(db, ".info/connected");
+
+        import("https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js")
+            .then(({ onValue }) => {
+
+                onValue(connectionRef, (snapshot) => {
+
+                    updateConnection(snapshot.val() === true);
+
+                });
+
+            });
+
+
+        // =====================================================
+        // INICIO
+        // =====================================================
+
+        updateProfile();
+
+        if (!username) {
+
+            openUsernameModal();
+
+        }
+
     </script>
-</head>
-<body class="h-screen flex flex-col items-center justify-center sm:p-4 md:p-6 overflow-hidden">
-
-    <!-- Modal de ingreso de nombre con efecto Glassmorphism -->
-    <div id="username-form" class="fixed inset-0 flex items-center justify-center bg-pink-950/25 backdrop-blur-md z-50 p-4 transition-opacity">
-        <div class="bg-white/95 border border-pink-200 p-7 sm:p-8 rounded-3xl shadow-2xl shadow-pink-500/15 max-w-sm w-full text-center transform transition-all">
-            <div class="w-14 h-14 bg-gradient-to-tr from-pink-400 to-pink-600 rounded-2xl mx-auto mb-4 flex items-center justify-center shadow-lg shadow-pink-300">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-                </svg>
-            </div>
-            <h2 class="text-2xl font-bold text-gray-800 mb-1">Bienvenido al Chat</h2>
-            <p class="text-sm text-pink-600/80 mb-6">Elige un nombre para unirte a la sala</p>
-            
-            <div class="text-left mb-4">
-                <input type="text" id="usernameInput" placeholder="Tu nombre o apodo..." maxlength="24"
-                    class="w-full px-4 py-3 bg-pink-50/70 border border-pink-200 rounded-xl text-gray-800 placeholder-pink-300 focus:bg-white focus:outline-none focus:ring-2 focus:ring-pink-400 focus:border-transparent transition-all">
-            </div>
-            <button id="username-submit" 
-                class="w-full bg-gradient-to-r from-pink-500 to-pink-600 hover:from-pink-600 hover:to-pink-700 active:scale-[0.98] text-white font-semibold py-3 px-4 rounded-xl shadow-md shadow-pink-300/60 transition-all cursor-pointer">
-                Entrar a la sala
-            </button>
-        </div>
-    </div>
-
-    <!-- Contenedor Principal tipo App Card centrada en escritorio, pantalla completa en móvil -->
-    <div class="w-full max-w-3xl h-full sm:h-[90vh] bg-white/85 backdrop-blur-xl sm:rounded-3xl shadow-xl shadow-pink-200/60 border border-pink-200/80 flex flex-col overflow-hidden">
-        
-        <!-- Header moderno -->
-        <header class="bg-gradient-to-r from-pink-400 via-pink-500 to-pink-400 text-white px-5 py-4 flex items-center justify-between shadow-sm z-10 flex-shrink-0">
-            <div class="flex items-center gap-3">
-                <div class="w-10 h-10 rounded-2xl bg-white/20 backdrop-blur-xs flex items-center justify-center border border-white/30">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-white" viewBox="0 0 20 20" fill="currentColor">
-                        <path fill-rule="evenodd" d="M18 10c0 3.866-3.582 7-8 7a8.841 8.841 0 01-4.083-.98L2 17l1.338-3.123C2.493 12.767 2 11.434 2 10c0-3.866 3.582-7 8-7s8 3.582 8 7zM7 9H5v2h2V9zm8 0h-2v2h2V9zM9 9h2v2H9V9z" clip-rule="evenodd" />
-                    </svg>
-                </div>
-                <div>
-                    <h1 class="text-lg font-bold tracking-tight leading-tight">Chat en Vivo</h1>
-                    <div class="flex items-center gap-1.5 text-xs text-pink-100">
-                        <span class="w-2 h-2 rounded-full bg-emerald-300 animate-pulse"></span>
-                        <span>Sala conectada</span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Indicador de usuario actual -->
-            <div class="hidden items-center gap-2 bg-white/15 border border-white/25 px-3 py-1.5 rounded-full text-xs font-medium backdrop-blur-xs">
-                <span class="w-2 h-2 rounded-full bg-pink-100"></span>
-                <span id="current-user-badge" class="truncate max-w-[110px]"></span>
-            </div>
-        </header>
-
-        <!-- Área de mensajes -->
-        <main id="chat-messages" class="flex-grow overflow-y-auto px-4 sm:px-6 py-5 bg-gradient-to-b from-pink-50/40 to-white/60 scroll-smooth">
-            <!-- Los mensajes del chat se cargarán aquí -->
-        </main>
-
-        <!-- Barra inferior de escritura -->
-        <footer class="bg-pink-50/90 border-t border-pink-200/80 px-4 py-3.5 sm:px-5 flex-shrink-0">
-            <div class="flex items-center gap-2.5 bg-white border border-pink-200 rounded-2xl p-1.5 pl-4 shadow-xs focus-within:ring-2 focus-within:ring-pink-400 focus-within:border-transparent transition-all">
-                <input type="text" id="messageInput" placeholder="Escribe un mensaje..." autocomplete="off"
-                    class="flex-grow bg-transparent text-gray-800 placeholder-pink-300 text-sm sm:text-[15px] focus:outline-none py-1.5">
-                <button onclick="sendMessage()" aria-label="Enviar mensaje"
-                    class="bg-gradient-to-r from-pink-500 to-pink-600 hover:from-pink-600 hover:to-pink-700 active:scale-95 text-white font-medium px-4 py-2 rounded-xl shadow-sm shadow-pink-300/60 flex items-center gap-1.5 transition-all cursor-pointer flex-shrink-0">
-                    <span class="text-sm hidden sm:inline">Enviar</span>
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 transform rotate-90" viewBox="0 0 20 20" fill="currentColor">
-                        <path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z" />
-                    </svg>
-                </button>
-            </div>
-        </footer>
-
-    </div>
 
 </body>
 </html>
